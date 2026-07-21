@@ -1,0 +1,10 @@
+---
+aviso:
+  enabled: false
+
+  # Replace this section after confirming the event schema, listener command,
+  # endpoint, authentication mechanism and retry behaviour used by the PoC.
+  listener:
+    endpoint: REPLACE_BEFORE_ENABLING_AVISO
+    event: REPLACE_BEFORE_ENABLING_AVISO
+    retry_seconds: 60

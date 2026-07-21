@@ -1,0 +1,5 @@
+---
+# This first scaffold uses only ansible.builtin modules.
+# Add and pin external roles or collections here when required.
+roles: []
+collections: []

@@ -1,0 +1,25 @@
+---
+workflow:
+  mode: "{{ flexpart_workflow_mode }}"
+  install_directory: "{{ flexpart_install_dir }}"
+  data_directory: "{{ flexpart_data_dir }}"
+  log_directory: "{{ flexpart_log_dir }}"
+
+storage:
+  backend: "{{ flexpart_storage_backend }}"
+  endpoint_url: "{{ flexpart_s3_endpoint_url }}"
+  buckets:
+    raw_ifs: "{{ flexpart_raw_ifs_bucket }}"
+    preprocessed: "{{ flexpart_preprocessed_bucket }}"
+    model_output: "{{ flexpart_output_bucket }}"
+    plots: "{{ flexpart_plots_bucket }}"
+
+aviso:
+  enabled: {{ flexpart_aviso_enabled | bool | lower }}
+  # Add the confirmed Aviso configuration fields here.
+
+components:
+  orchestrator_image: "{{ flexpart_orchestrator_image }}"
+  flexprep_image: "{{ flexprep_image }}"
+  flexpart_image: "{{ flexpart_model_image }}"
+  pyflexplot_image: "{{ pyflexplot_image }}"

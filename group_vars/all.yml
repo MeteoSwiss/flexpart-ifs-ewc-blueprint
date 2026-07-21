@@ -1,0 +1,40 @@
+---
+# Installation paths
+flexpart_service_user: flexpart
+flexpart_service_group: flexpart
+flexpart_install_dir: /opt/flexpart-ifs
+flexpart_data_dir: /var/lib/flexpart-ifs
+flexpart_log_dir: /var/log/flexpart-ifs
+
+# Deployment behaviour. Keep false until real images and component commands are known.
+flexpart_pull_images: false
+flexpart_start_services: false
+flexpart_run_reference_case: false
+
+# Workflow execution mode: manual or aviso
+flexpart_workflow_mode: manual
+flexpart_aviso_enabled: false
+
+# Pin real image tags or digests before deployment.
+flexpart_orchestrator_image: REPLACE_BEFORE_DEPLOYMENT
+flexprep_image: REPLACE_BEFORE_DEPLOYMENT
+flexpart_model_image: REPLACE_BEFORE_DEPLOYMENT
+pyflexplot_image: REPLACE_BEFORE_DEPLOYMENT
+
+# Replace with the command supported by the real orchestrator image.
+flexpart_orchestrator_command:
+  - REPLACE_BEFORE_DEPLOYMENT
+
+# Storage configuration
+flexpart_storage_backend: s3
+flexpart_s3_endpoint_url: REPLACE_BEFORE_DEPLOYMENT
+flexpart_raw_ifs_bucket: flexpart-raw-ifs
+flexpart_preprocessed_bucket: flexpart-preprocessed
+flexpart_output_bucket: flexpart-output
+flexpart_plots_bucket: flexpart-plots
+
+# Credentials are read from a protected environment file on the target host.
+flexpart_secrets_file: "{{ flexpart_install_dir }}/config/secrets.env"
+
+# Reference case
+flexpart_reference_config: "{{ flexpart_install_dir }}/examples/reference-case/run.yml"

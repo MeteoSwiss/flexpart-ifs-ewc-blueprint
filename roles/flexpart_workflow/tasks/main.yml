@@ -1,0 +1,93 @@
+---
+- name: Create workflow directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ flexpart_service_user }}"
+    group: "{{ flexpart_service_group }}"
+    mode: "{{ item.mode }}"
+  loop: "{{ flexpart_directory_definitions }}"
+
+- name: Install Docker Compose definition
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ flexpart_install_dir }}/compose.yml"
+    owner: "{{ flexpart_service_user }}"
+    group: "{{ flexpart_service_group }}"
+    mode: "0640"
+
+- name: Install workflow configuration
+  ansible.builtin.template:
+    src: workflow.yml.j2
+    dest: "{{ flexpart_install_dir }}/config/workflow.yml"
+    owner: "{{ flexpart_service_user }}"
+    group: "{{ flexpart_service_group }}"
+    mode: "0640"
+
+- name: Install non-secret environment configuration
+  ansible.builtin.template:
+    src: workflow.env.j2
+    dest: "{{ flexpart_install_dir }}/config/workflow.env"
+    owner: "{{ flexpart_service_user }}"
+    group: "{{ flexpart_service_group }}"
+    mode: "0640"
+
+- name: Check whether secrets file exists
+  ansible.builtin.stat:
+    path: "{{ flexpart_secrets_file }}"
+  register: flexpart_secrets_stat
+
+- name: Install empty protected secrets template when absent
+  ansible.builtin.copy:
+    src: secrets.env.example
+    dest: "{{ flexpart_secrets_file }}"
+    owner: "{{ flexpart_service_user }}"
+    group: "{{ flexpart_service_group }}"
+    mode: "0600"
+  when: not flexpart_secrets_stat.stat.exists
+
+- name: Install operational scripts
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ flexpart_install_dir }}/scripts/{{ item }}"
+    owner: "{{ flexpart_service_user }}"
+    group: "{{ flexpart_service_group }}"
+    mode: "0755"
+  loop:
+    - validate-environment.sh
+    - workflow-control.sh
+
+- name: Install reference-case skeleton
+  ansible.builtin.copy:
+    src: reference-run.yml
+    dest: "{{ flexpart_install_dir }}/examples/reference-case/run.yml"
+    owner: "{{ flexpart_service_user }}"
+    group: "{{ flexpart_service_group }}"
+    mode: "0644"
+
+- name: Validate that image placeholders have been replaced before pulling
+  ansible.builtin.assert:
+    that:
+      - flexpart_orchestrator_image != 'REPLACE_BEFORE_DEPLOYMENT'
+      - flexprep_image != 'REPLACE_BEFORE_DEPLOYMENT'
+      - flexpart_model_image != 'REPLACE_BEFORE_DEPLOYMENT'
+      - pyflexplot_image != 'REPLACE_BEFORE_DEPLOYMENT'
+    fail_msg: >-
+      Set all four pinned image names before enabling flexpart_pull_images.
+  when: flexpart_pull_images | bool
+
+- name: Pull workflow images
+  ansible.builtin.command:
+    cmd: docker compose --env-file config/workflow.env -f compose.yml pull
+    chdir: "{{ flexpart_install_dir }}"
+  become_user: "{{ flexpart_service_user }}"
+  changed_when: true
+  when: flexpart_pull_images | bool
+
+- name: Start workflow services
+  ansible.builtin.command:
+    cmd: docker compose --env-file config/workflow.env -f compose.yml up -d orchestrator
+    chdir: "{{ flexpart_install_dir }}"
+  become_user: "{{ flexpart_service_user }}"
+  changed_when: true
+  when: flexpart_start_services | bool

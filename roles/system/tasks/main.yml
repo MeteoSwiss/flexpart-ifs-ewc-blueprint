@@ -1,0 +1,26 @@
+---
+- name: Refresh apt metadata
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install base packages
+  ansible.builtin.apt:
+    name: "{{ flexpart_system_packages }}"
+    state: present
+
+- name: Create workflow service group
+  ansible.builtin.group:
+    name: "{{ flexpart_service_group }}"
+    system: true
+    state: present
+
+- name: Create workflow service user
+  ansible.builtin.user:
+    name: "{{ flexpart_service_user }}"
+    group: "{{ flexpart_service_group }}"
+    system: true
+    create_home: true
+    home: "/home/{{ flexpart_service_user }}"
+    shell: /bin/bash
+    state: present

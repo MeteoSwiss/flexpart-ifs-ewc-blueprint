@@ -1,0 +1,44 @@
+---
+name: flexpart-ifs
+
+x-workflow-common: &workflow-common
+  restart: "no"
+  env_file:
+    - ./config/workflow.env
+    - ./config/secrets.env
+  volumes:
+    - "{{ flexpart_install_dir }}/config:/etc/flexpart-workflow:ro"
+    - "{{ flexpart_data_dir }}:/var/lib/flexpart-workflow"
+    - "{{ flexpart_log_dir }}:/var/log/flexpart-workflow"
+
+services:
+  orchestrator:
+    <<: *workflow-common
+    image: "{{ flexpart_orchestrator_image }}"
+    command: {{ flexpart_orchestrator_command | to_json }}
+    environment:
+      FLEXPREP_IMAGE: "{{ flexprep_image }}"
+      FLEXPART_IMAGE: "{{ flexpart_model_image }}"
+      PYFLEXPLOT_IMAGE: "{{ pyflexplot_image }}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - "{{ flexpart_install_dir }}/config:/etc/flexpart-workflow:ro"
+      - "{{ flexpart_data_dir }}:/var/lib/flexpart-workflow"
+      - "{{ flexpart_log_dir }}:/var/log/flexpart-workflow"
+
+  # The following services are available for direct smoke tests and manual
+  # debugging. Their actual commands and interfaces must be confirmed.
+  flexprep:
+    <<: *workflow-common
+    image: "{{ flexprep_image }}"
+    profiles: ["components"]
+
+  flexpart:
+    <<: *workflow-common
+    image: "{{ flexpart_model_image }}"
+    profiles: ["components"]
+
+  pyflexplot:
+    <<: *workflow-common
+    image: "{{ pyflexplot_image }}"
+    profiles: ["components"]

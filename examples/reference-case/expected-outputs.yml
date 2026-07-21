@@ -1,0 +1,11 @@
+---
+# Replace with exact files or patterns after the approved case runs successfully.
+expected:
+  preprocessed_files: []
+  flexpart_outputs: []
+  plots: []
+  log_files:
+    - orchestrator.log
+    - flexprep.log
+    - flexpart.log
+    - pyflexplot.log

@@ -1,0 +1,29 @@
+---
+- name: Deploy the FLEXPART-IFS workflow on EWC
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Verify supported operating system
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.os_family == "Debian"
+          - ansible_facts.distribution == "Ubuntu"
+          - ansible_facts.distribution_major_version | int >= 22
+        fail_msg: >-
+          This initial blueprint supports Ubuntu 22.04 or newer. Extend and test
+          the roles before using another operating system.
+
+    - name: Show deployment target
+      ansible.builtin.debug:
+        msg:
+          - "Host: {{ inventory_hostname }}"
+          - "OS: {{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }}"
+          - "Architecture: {{ ansible_facts.architecture }}"
+
+  roles:
+    - role: system
+    - role: docker
+    - role: flexpart_workflow
+    - role: validation

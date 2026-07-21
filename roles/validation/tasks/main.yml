@@ -1,0 +1,31 @@
+---
+- name: Validate Docker Compose file when image placeholders are replaced
+  ansible.builtin.command:
+    cmd: docker compose --env-file config/workflow.env -f compose.yml config --quiet
+    chdir: "{{ flexpart_install_dir }}"
+  become_user: "{{ flexpart_service_user }}"
+  changed_when: false
+  when:
+    - flexpart_orchestrator_image != 'REPLACE_BEFORE_DEPLOYMENT'
+    - flexprep_image != 'REPLACE_BEFORE_DEPLOYMENT'
+    - flexpart_model_image != 'REPLACE_BEFORE_DEPLOYMENT'
+    - pyflexplot_image != 'REPLACE_BEFORE_DEPLOYMENT'
+
+- name: Run base environment validation
+  ansible.builtin.command:
+    cmd: "{{ flexpart_install_dir }}/scripts/validate-environment.sh"
+  changed_when: false
+  register: flexpart_validation
+
+- name: Display validation result
+  ansible.builtin.debug:
+    var: flexpart_validation.stdout_lines
+
+- name: Display next steps
+  ansible.builtin.debug:
+    msg:
+      - "Installation directory: {{ flexpart_install_dir }}"
+      - "Data directory: {{ flexpart_data_dir }}"
+      - "Log directory: {{ flexpart_log_dir }}"
+      - "Edit protected secrets: {{ flexpart_secrets_file }}"
+      - "Control command: {{ flexpart_install_dir }}/scripts/workflow-control.sh"

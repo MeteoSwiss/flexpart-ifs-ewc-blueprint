@@ -1,0 +1,18 @@
+---
+# Replace these placeholders with a scientifically approved small reference case.
+run:
+  name: reference-case
+  start_time: REPLACE_BEFORE_REFERENCE_TEST
+  duration_hours: 6
+
+release:
+  longitude: REPLACE_BEFORE_REFERENCE_TEST
+  latitude: REPLACE_BEFORE_REFERENCE_TEST
+  altitude_m: REPLACE_BEFORE_REFERENCE_TEST
+  species: REPLACE_BEFORE_REFERENCE_TEST
+  mass_kg: REPLACE_BEFORE_REFERENCE_TEST
+
+plotting:
+  enabled: true
+  formats:
+    - png
