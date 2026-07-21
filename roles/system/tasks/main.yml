@@ -24,3 +24,13 @@
     home: "/home/{{ flexpart_service_user }}"
     shell: /bin/bash
     state: present
+
+- name: Install orchestrator system dependencies
+  ansible.builtin.apt:
+    name:
+      - git
+      - python3
+      - python3-pip
+      - python3-venv
+    state: present
+    update_cache: true
