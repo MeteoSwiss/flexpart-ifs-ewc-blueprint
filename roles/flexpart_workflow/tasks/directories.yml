@@ -1,48 +1,17 @@
 ---
-- name: Create FLEXPART installation directory
+- name: Create FLEXPART installation directories
   ansible.builtin.file:
-    path: "{{ flexpart_install_dir }}"
+    path: "{{ item.path }}"
     state: directory
     owner: "{{ flexpart_service_user }}"
     group: "{{ flexpart_service_group }}"
-    mode: "0755"
+    mode: "{{ item.mode }}"
+  loop: "{{ flexpart_directory_definitions }}"
 
-- name: Create FLEXPART source directory
-  ansible.builtin.file:
-    path: "{{ flexpart_install_dir }}/src"
-    state: directory
-    owner: "{{ flexpart_service_user }}"
-    group: "{{ flexpart_service_group }}"
-    mode: "0755"
-
-- name: Create FLEXPART configuration directory
+- name: Keep FLEXPART configuration owned by root
   ansible.builtin.file:
     path: "{{ flexpart_config_dir }}"
     state: directory
     owner: root
-    group: "{{ flexpart_service_group }}"
-    mode: "0750"
-
-- name: Create FLEXPART data directories
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ flexpart_service_user }}"
-    group: "{{ flexpart_service_group }}"
-    mode: "0750"
-  loop:
-    - "{{ flexpart_data_dir }}"
-    - "{{ flexpart_data_dir }}/input"
-    - "{{ flexpart_data_dir }}/input/raw"
-    - "{{ flexpart_data_dir }}/input/preprocessed"
-    - "{{ flexpart_data_dir }}/output"
-    - "{{ flexpart_data_dir }}/runs"
-    - "{{ flexpart_database_dir }}"
-
-- name: Create FLEXPART log directory
-  ansible.builtin.file:
-    path: "{{ flexpart_log_dir }}"
-    state: directory
-    owner: "{{ flexpart_service_user }}"
     group: "{{ flexpart_service_group }}"
     mode: "0750"

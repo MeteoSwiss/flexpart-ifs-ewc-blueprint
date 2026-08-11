@@ -25,6 +25,12 @@
     shell: /bin/bash
     state: present
 
+- name: Add workflow operator to FLEXPART service group
+  ansible.builtin.user:
+    name: "{{ flexpart_operator_user }}"
+    groups: "{{ flexpart_service_group }}"
+    append: true
+
 - name: Install orchestrator system dependencies
   ansible.builtin.apt:
     name:

@@ -1,30 +1,63 @@
 ---
 name: flexpart-ifs
 
-x-workflow-common: &workflow-common
-  restart: "no"
-  env_file:
-    - ./config/workflow.env
-    - ./config/secrets.env
-  volumes:
-    - "{{ flexpart_install_dir }}/config:/etc/flexpart-workflow:ro"
-    - "{{ flexpart_data_dir }}:/var/lib/flexpart-workflow"
-    - "{{ flexpart_log_dir }}:/var/log/flexpart-workflow"
-
 services:
-  # The following services are available for direct smoke tests and manual
-  # debugging. Their actual commands and interfaces must be confirmed.
-  flexprep:
-    <<: *workflow-common
-    image: "{{ flexprep_image }}"
-    profiles: ["components"]
-
   flexpart:
-    <<: *workflow-common
     image: "{{ flexpart_model_image }}"
-    profiles: ["components"]
+    volumes:
+      - "${METEO_DIR}:/scratch/jobs/data:ro"
+      - "${FLEXPART_RUN_DIR}:/scratch/jobs"
+    environment:
+      - RELEASE_SITE_NAME=${RELEASE_SITE_NAME}
+      - FORECAST_DATETIME=${FORECAST_DATETIME}
+      - MODEL=IFS-Europe
+      - EMISSION_START_YYYY=${EMISSION_START_YYYY}
+      - EMISSION_START_MM=${EMISSION_START_MM}
+      - EMISSION_START_DD=${EMISSION_START_DD}
+      - EMISSION_START_ZZ=${EMISSION_START_ZZ}
+      - EMISSION_END_YYYY=${EMISSION_END_YYYY}
+      - EMISSION_END_MM=${EMISSION_END_MM}
+      - EMISSION_END_DD=${EMISSION_END_DD}
+      - EMISSION_END_ZZ=${EMISSION_END_ZZ}
+      - SIMULATION_END_YYYY=${SIMULATION_END_YYYY}
+      - SIMULATION_END_MM=${SIMULATION_END_MM}
+      - SIMULATION_END_DD=${SIMULATION_END_DD}
+      - SIMULATION_END_ZZ=${SIMULATION_END_ZZ}
+
+    # The image's default entrypoint uploads FLEXPART output to S3. The EWC
+    # workflow keeps the complete run local and therefore runs only generation
+    # plus FLEXPART itself.
+    entrypoint: ["/bin/bash", "-lc"]
+    command:
+      - |
+        set -euo pipefail
+        python -m flexpart_ifs_utils generate \
+          --flexpart_dir /opt/spack-view \
+          --jobs_dir /scratch/jobs \
+          --datetime "${FORECAST_DATETIME}" \
+          --site "${RELEASE_SITE_NAME}" \
+          --model IFS-Europe
+
+        names=$$(grep -oP 'name: \K.*' /scratch/jobs/runtime_configuration.yaml)
+        for name in $$names; do
+          echo "Running FLEXPART-IFS for release site: $$name"
+          cd "/scratch/jobs/$$name"
+          bash job
+        done
 
   pyflexplot:
-    <<: *workflow-common
     image: "{{ pyflexplot_image }}"
-    profiles: ["components"]
+    volumes:
+      - "${FLEXPART_RUN_DIR}:/work/flexpart:ro"
+      - "${PLOT_DIR}:/work/plots"
+    command:
+      - "--preset"
+      - "${PRESET}"
+      - "--merge-pdfs"
+      - "--dest=/work/plots"
+      - "--setup"
+      - "infile"
+      - "/work/flexpart/${RELEASE_SITE_NAME}/output/grid_conc_${IBDATE}${IBTIME}0000.nc"
+      - "--setup"
+      - "base_time"
+      - "${IBDATE}${IBTIME}"

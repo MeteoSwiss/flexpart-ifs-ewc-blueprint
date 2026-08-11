@@ -47,3 +47,9 @@
     name: "{{ flexpart_service_user }}"
     groups: docker
     append: true
+
+- name: Add workflow operator to Docker group
+  ansible.builtin.user:
+    name: "{{ flexpart_operator_user }}"
+    groups: docker
+    append: true

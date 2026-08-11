@@ -1,0 +1,8 @@
+---
+- name: Install FLEXPART workflow configuration
+  ansible.builtin.template:
+    src: workflow.yml.j2
+    dest: "{{ flexpart_orchestrator_config }}"
+    owner: root
+    group: "{{ flexpart_service_group }}"
+    mode: "0640"

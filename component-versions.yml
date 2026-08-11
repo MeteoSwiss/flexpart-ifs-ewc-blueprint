@@ -21,15 +21,15 @@ components:
     version: REPLACE_BEFORE_RELEASE
 
   flexpart:
-    repository: REPLACE_BEFORE_RELEASE
-    version: REPLACE_BEFORE_RELEASE
-    commit: 0a94e1e98937e37e124ac43dd6fbc7d984576565
-    image: REPLACE_BEFORE_RELEASE
+    repository: https://github.com/MeteoSwiss/flexpart.git
+    version: 10.5.0
+    commit: REPLACE_BEFORE_RELEASE
+    image: docker.io/ninaburg/flexpart-ifs:10.5.0
     image_digest: REPLACE_BEFORE_RELEASE
 
   pyflexplot:
-    repository: REPLACE_BEFORE_RELEASE
-    version: REPLACE_BEFORE_RELEASE
+    repository: https://github.com/MeteoSwiss-APN/pyflexplot.git
+    version: 2.7.1
     commit: REPLACE_BEFORE_RELEASE
-    image: REPLACE_BEFORE_RELEASE
+    image: docker.io/ninaburg/pyflexplot:2.7.1
     image_digest: REPLACE_BEFORE_RELEASE

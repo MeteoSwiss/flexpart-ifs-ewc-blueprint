@@ -1,25 +1,24 @@
 ---
-workflow:
-  mode: "{{ flexpart_workflow_mode }}"
-  install_directory: "{{ flexpart_install_dir }}"
-  data_directory: "{{ flexpart_data_dir }}"
-  log_directory: "{{ flexpart_log_dir }}"
+main:
+  runtime:
+    compose_file: "{{ flexpart_compose_file }}"
+    run_dir: "{{ flexpart_run_dir }}"
+    plot_dir: "{{ flexpart_plot_dir }}"
 
-storage:
-  backend: "{{ flexpart_storage_backend }}"
-  endpoint_url: "{{ flexpart_s3_endpoint_url }}"
-  buckets:
-    raw_ifs: "{{ flexpart_raw_ifs_bucket }}"
-    preprocessed: "{{ flexpart_preprocessed_bucket }}"
-    model_output: "{{ flexpart_output_bucket }}"
-    plots: "{{ flexpart_plots_bucket }}"
+  flexprep:
+    output_dir: "{{ flexpart_meteorology_dir }}"
+    area:
+      - {{ flexpart_area[0] }}
+      - {{ flexpart_area[1] }}
+      - {{ flexpart_area[2] }}
+      - {{ flexpart_area[3] }}
+    grid:
+      - {{ flexpart_grid[0] }}
+      - {{ flexpart_grid[1] }}
+    max_level: {{ flexpart_max_level }}
+    mars_class: "{{ flexpart_mars_class }}"
+    expver: "{{ flexpart_mars_expver }}"
 
-aviso:
-  enabled: {{ flexpart_aviso_enabled | bool | lower }}
-  # Add the confirmed Aviso configuration fields here.
-
-components:
-  orchestrator_image: "{{ flexpart_orchestrator_image }}"
-  flexprep_image: "{{ flexprep_image }}"
-  flexpart_image: "{{ flexpart_model_image }}"
-  pyflexplot_image: "{{ pyflexplot_image }}"
+  workflow:
+    plotting_preset: "{{ flexpart_plotting_preset }}"
+    emission_duration_hours: {{ flexpart_emission_duration_hours }}

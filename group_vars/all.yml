@@ -1,18 +1,27 @@
-# Installation paths
+# Installation users and paths
 flexpart_service_user: flexpart
 flexpart_service_group: flexpart
+
+# The user who invokes flexpart-workflow on the EWC VM. The inventory already
+# defines ansible_user, so use the same account by default. This user owns the
+# MARS client configuration/credentials used by the host-side orchestrator.
+flexpart_operator_user: "{{ ansible_user }}"
 
 flexpart_install_dir: /opt/flexpart-ifs
 flexpart_config_dir: /etc/flexpart-ifs
 flexpart_data_dir: /var/lib/flexpart-ifs
 flexpart_log_dir: /var/log/flexpart-ifs
-flexpart_database_dir: "{{ flexpart_data_dir }}/database"
 
-# Host-installed orchestrator
+flexpart_meteorology_dir: "{{ flexpart_data_dir }}/meteorology"
+flexpart_run_dir: "{{ flexpart_data_dir }}/runs"
+flexpart_plot_dir: "{{ flexpart_data_dir }}/plots"
+
+# Host-installed orchestrator. Pin this to a release tag or commit before the
+# final Community Hub publication. The feature branch is used for the current
+# prototype because it contains the EWC MARS -> flexprep -> FLEXPART workflow.
 flexpart_orchestrator_repository: >-
   https://github.com/MeteoSwiss/flex-container-orchestrator.git
-
-flexpart_orchestrator_version: REPLACE_WITH_TAG_OR_COMMIT
+flexpart_orchestrator_version: feat/ewc-blueprint-runtime
 flexpart_orchestrator_source_dir: >-
   {{ flexpart_install_dir }}/src/flex-container-orchestrator
 flexpart_orchestrator_venv: "{{ flexpart_install_dir }}/venv"
@@ -20,5 +29,18 @@ flexpart_orchestrator_config: "{{ flexpart_config_dir }}/workflow.yml"
 flexpart_orchestrator_executable: >-
   {{ flexpart_orchestrator_venv }}/bin/flexpart-workflow
 
-# Credentials
-flexpart_secrets_file: "{{ flexpart_config_dir }}/secrets.env"
+# Runtime configuration. Forecast mode/date, forecast duration and release site
+# intentionally remain command-line arguments to flexpart-workflow.
+flexpart_compose_file: "{{ flexpart_install_dir }}/compose.yml"
+flexpart_area: [65, -10, 35, 47]
+flexpart_grid: [0.25, 0.25]
+flexpart_max_level: 137
+flexpart_mars_class: od
+flexpart_mars_expver: "1"
+flexpart_plotting_preset: opr/ifs-hres-eu/all_pdf
+flexpart_emission_duration_hours: 1
+
+# Public container images used by the host-side orchestrator. Docker Compose
+# can pull these directly from Docker Hub without registry authentication.
+flexpart_model_image: docker.io/ninaburg/flexpart-ifs:10.5.0
+pyflexplot_image: docker.io/ninaburg/pyflexplot:2.7.1

@@ -1,0 +1,8 @@
+---
+- name: Install Docker Compose definition
+  ansible.builtin.template:
+    src: compose.yml.j2
+    dest: "{{ flexpart_compose_file }}"
+    owner: root
+    group: "{{ flexpart_service_group }}"
+    mode: "0644"
