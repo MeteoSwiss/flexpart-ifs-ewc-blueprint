@@ -6,11 +6,14 @@ ecmwf_data_flavour_source_dir: "{{ ecmwf_data_flavour_root }}/source"
 ecmwf_data_flavour_item_dir: >-
   {{ ecmwf_data_flavour_source_dir }}/playbooks/ecmwf-data-flavour
 ecmwf_data_flavour_requirements_file: >-
-  {{ ecmwf_data_flavour_item_dir }}/requirements.yml
+  {{ ecmwf_data_flavour_source_dir }}/requirements.yml
 ecmwf_data_flavour_playbook: >-
   {{ ecmwf_data_flavour_item_dir }}/ecmwf-data-flavour.yml
-ecmwf_data_flavour_ansible_venv: "{{ ecmwf_data_flavour_root }}/ansible-venv"
+# Match EWCCLI's dependency-install pattern: the upstream Community Hub item
+# points to requirements.yml at the repository root, and those roles are
+# installed separately before the playbook is executed.
 ecmwf_data_flavour_roles_dir: "{{ ecmwf_data_flavour_root }}/roles"
+ecmwf_data_flavour_ansible_venv: "{{ ecmwf_data_flavour_root }}/ansible-venv"
 ecmwf_data_flavour_inventory: "{{ ecmwf_data_flavour_root }}/inventory.yml"
 # Keep the bootstrap isolated from the workflow virtualenv.
 ecmwf_data_flavour_ansible_spec: "ansible-core>=2.15,<2.18"

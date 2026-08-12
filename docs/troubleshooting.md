@@ -1,14 +1,34 @@
 # Troubleshooting
 
-## Placeholders remain
+## EWCCLI creates Rocky instead of Ubuntu
 
-Search the installed configuration:
+This blueprint relies on `defaultImageName: Ubuntu-24.04`, which is consumed by
+EWCCLI 0.7.1 and newer. Check the installed version:
 
 ```bash
-grep -R "REPLACE_BEFORE" /opt/flexpart-ifs
+ewc version
 ```
 
-Replace all relevant values before pulling or starting containers.
+When testing the local catalogue, the deployment summary should show an Ubuntu
+24.04 image. Users may still override the item default explicitly with
+`--image-name` when appropriate.
+
+## Ansible tries a private 192.168.x.x address
+
+EWCCLI 0.7.1 and newer can allocate an external IP for this item through
+`externalIP: true` and use that address for the Ansible phase. If no external IP
+is available, check floating-IP quota, external-network configuration and the
+EWCCLI deployment output.
+
+If the external IP is reachable only through a corporate proxy/VPN/bastion,
+configure that on the calling machine. The blueprint intentionally does not
+hard-code organisation-specific SSH routing.
+
+## ECMWF Data Flavour bootstrap fails on a non-Ubuntu host
+
+The automatic Data Flavour bootstrap follows the upstream Ubuntu deployment
+path. Use Ubuntu 24.04, or provide a functioning native `mars` client before
+running this blueprint on another supported distribution.
 
 ## Docker is unavailable
 
@@ -17,18 +37,12 @@ sudo systemctl status docker
 sudo journalctl -u docker --since today
 ```
 
-## Registry access fails
+## MARS access fails
 
-Confirm the image address, network access and registry authentication. Avoid using mutable `latest` tags.
-
-## S3 access fails
-
-Confirm endpoint, bucket names, credentials, certificate trust and network access. Never paste secret values into issue reports.
-
-## Aviso event is not received
-
-Run the workflow manually first. Confirm the Aviso endpoint, event filter, authentication, listener logs and retry behaviour before enabling operational mode.
+Confirm that `mars` is installed and that the workflow operator has valid ECMWF
+credentials and data entitlements. Never paste credentials into issue reports.
 
 ## Scientific stage fails
 
-Collect the orchestrator, Flexprep, FLEXPART and Pyflexplot logs separately. Record the component image digest and the resolved run configuration.
+Collect the orchestrator, flexprep, FLEXPART and Pyflexplot logs separately.
+Record the component image digest and the resolved run configuration.

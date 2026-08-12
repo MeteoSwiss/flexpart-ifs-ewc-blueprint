@@ -8,7 +8,18 @@
   changed_when: false
   failed_when: false
 
-- name: Create ECMWF Data Flavour bootstrap directory
+- name: Require Ubuntu for automatic ECMWF Data Flavour bootstrap
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.distribution == 'Ubuntu'
+    fail_msg: >-
+      Automatic installation of ECMWF Data Flavour {{ ecmwf_data_flavour_version }}
+      is supported by this blueprint on Ubuntu, matching the upstream Community
+      Hub item. On another distribution, install/provide the native MARS client
+      first or deploy the blueprint on Ubuntu 24.04.
+  when: ecmwf_data_flavour_mars_before.rc != 0
+
+- name: Create ECMWF Data Flavour bootstrap directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -47,8 +58,9 @@
       - ecmwf_data_flavour_files.results[1].stat.exists
     fail_msg: >-
       ECMWF Data Flavour {{ ecmwf_data_flavour_version }} does not contain the
-      expected requirements.yml and ecmwf-data-flavour.yml files. Update the
-      pinned integration before deploying a different upstream layout.
+      expected repository-root requirements.yml and ECMWF Data Flavour playbook.
+      Inspect {{ ecmwf_data_flavour_source_dir }} and update the pinned integration
+      before deploying a different upstream layout.
   when: ecmwf_data_flavour_mars_before.rc != 0
 
 - name: Create isolated Ansible environment for ECMWF Data Flavour
@@ -70,15 +82,20 @@
 
 - name: Install official ECMWF Data Flavour role requirements
   ansible.builtin.command:
-    cmd: >-
-      {{ ecmwf_data_flavour_ansible_venv }}/bin/ansible-galaxy role install
-      -r {{ ecmwf_data_flavour_requirements_file }}
-      --roles-path {{ ecmwf_data_flavour_roles_dir }}
+    argv:
+      - "{{ ecmwf_data_flavour_ansible_venv }}/bin/ansible-galaxy"
+      - role
+      - install
+      - -r
+      - "{{ ecmwf_data_flavour_requirements_file }}"
+      - --roles-path
+      - "{{ ecmwf_data_flavour_roles_dir }}"
+      - --force
   become: true
   become_user: "{{ flexpart_operator_user }}"
   environment:
     ANSIBLE_ROLES_PATH: "{{ ecmwf_data_flavour_roles_dir }}"
-  changed_when: false
+  changed_when: true
   when: ecmwf_data_flavour_mars_before.rc != 0
 
 - name: Install local inventory for ECMWF Data Flavour
@@ -90,12 +107,20 @@
     mode: "0600"
   when: ecmwf_data_flavour_mars_before.rc != 0
 
-- name: Apply official ECMWF Data Flavour
+- name: Apply official ECMWF Data Flavour without updating the VM
   ansible.builtin.command:
     argv:
       - "{{ ecmwf_data_flavour_ansible_venv }}/bin/ansible-playbook"
       - -i
       - "{{ ecmwf_data_flavour_inventory }}"
+      # The outer blueprint already prepares the operating system. The
+      # upstream Data Flavour playbook defaults update_vm=true, which can
+      # trigger a reboot. Because this nested play runs with a local
+      # connection, Ansible intentionally refuses to reboot its controller.
+      # Disable only that optional update role; MARS and ECMWF Toolbox still
+      # run normally.
+      - --extra-vars
+      - '{"update_vm": false}'
       - "{{ ecmwf_data_flavour_playbook }}"
     chdir: "{{ ecmwf_data_flavour_item_dir }}"
   become: true

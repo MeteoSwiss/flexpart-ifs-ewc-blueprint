@@ -5,5 +5,7 @@ all:
       hosts:
         flexpart-ewc-vm:
           ansible_host: REPLACE_WITH_VM_IP_OR_DNS
-          ansible_user: REPLACE_WITH_SSH_USER
+          # Ubuntu 24.04 is the recommended/default EWCCLI image. For a Rocky
+          # EWC image, the standard cloud account is normally cloud-user.
+          ansible_user: ubuntu
           ansible_ssh_private_key_file: ~/.ssh/REPLACE_WITH_PRIVATE_KEY

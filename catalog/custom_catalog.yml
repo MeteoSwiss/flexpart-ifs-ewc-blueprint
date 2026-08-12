@@ -39,11 +39,13 @@ spec:
         MARS credentials and data entitlements remain user-specific.
       home: https://github.com/MeteoSwiss/flexpart-ifs-ewc-blueprint
       sources:
-        - https://github.com/MeteoSwiss/flexpart-ifs-ewc-blueprint.git
+        - /home/bun/Documents/00_pilot_ecmwf/blueprint/test-ewccli/flexpart-ifs-ewc-blueprint
 
       ewccli:
         pathToRequirementsFile: requirements.yml
         pathToMainFile: deploy.yml
+        defaultImageName: Ubuntu-24.04
+        externalIP: true
         publicIP: true
         inputs: []
       license: https://github.com/MeteoSwiss/flexpart-ifs-ewc-blueprint/blob/main/LICENSE
