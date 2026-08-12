@@ -1,0 +1,78 @@
+---
+- name: Check installed workflow configuration
+  ansible.builtin.stat:
+    path: "{{ flexpart_orchestrator_config }}"
+  register: flexpart_workflow_config
+
+- name: Check installed Docker Compose definition
+  ansible.builtin.stat:
+    path: "{{ flexpart_compose_file }}"
+  register: flexpart_compose_definition
+
+- name: Check installed orchestrator command
+  ansible.builtin.stat:
+    path: /usr/local/bin/flexpart-workflow
+  register: flexpart_workflow_cli
+
+- name: Assert core workflow installation exists
+  ansible.builtin.assert:
+    that:
+      - flexpart_workflow_config.stat.exists
+      - flexpart_compose_definition.stat.exists
+      - flexpart_workflow_cli.stat.exists
+    fail_msg: >-
+      FLEXPART workflow deployment is incomplete. Expected the orchestrator
+      command, workflow.yml and compose.yml to be installed.
+
+- name: Validate Docker Compose syntax
+  ansible.builtin.command:
+    cmd: "docker compose -f {{ flexpart_compose_file }} config --quiet"
+  environment:
+    METEO_DIR: /tmp/flexpart-validation/meteo
+    FLEXPART_RUN_DIR: /tmp/flexpart-validation/runs
+    PLOT_DIR: /tmp/flexpart-validation/plots
+    RELEASE_SITE_NAME: BEZ
+    FORECAST_DATETIME: "20260810T00"
+    EMISSION_START_YYYY: "2026"
+    EMISSION_START_MM: "08"
+    EMISSION_START_DD: "10"
+    EMISSION_START_ZZ: "01"
+    EMISSION_END_YYYY: "2026"
+    EMISSION_END_MM: "08"
+    EMISSION_END_DD: "10"
+    EMISSION_END_ZZ: "02"
+    SIMULATION_END_YYYY: "2026"
+    SIMULATION_END_MM: "08"
+    SIMULATION_END_DD: "10"
+    SIMULATION_END_ZZ: "04"
+    PRESET: opr/ifs-hres-eu/all_pdf
+    IBDATE: "20260810"
+    IBTIME: "01"
+  become_user: "{{ flexpart_operator_user }}"
+  changed_when: false
+
+- name: Check that MARS is available to the workflow operator
+  ansible.builtin.shell:
+    cmd: /bin/bash -lc 'command -v mars'
+    executable: /bin/bash
+  become_user: "{{ flexpart_operator_user }}"
+  changed_when: false
+
+- name: Check orchestrator CLI help
+  ansible.builtin.command:
+    cmd: /usr/local/bin/flexpart-workflow --help
+  become_user: "{{ flexpart_operator_user }}"
+  changed_when: false
+
+- name: Display deployment summary
+  ansible.builtin.debug:
+    msg:
+      - "Orchestrator: /usr/local/bin/flexpart-workflow"
+      - "Configuration: {{ flexpart_orchestrator_config }}"
+      - "Compose: {{ flexpart_compose_file }}"
+      - "Meteorology: {{ flexpart_meteorology_dir }}"
+      - "Runs: {{ flexpart_run_dir }}"
+      - "Plots: {{ flexpart_plot_dir }}"
+      - "FLEXPART image: {{ flexpart_model_image }}"
+      - "Pyflexplot image: {{ pyflexplot_image }}"
+      - "Container images are public on Docker Hub; no registry login is required."

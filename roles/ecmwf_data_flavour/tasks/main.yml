@@ -1,0 +1,150 @@
+---
+- name: Check whether the native MARS client is already available
+  ansible.builtin.shell:
+    cmd: /bin/bash -lc 'command -v mars'
+  become: true
+  become_user: "{{ flexpart_operator_user }}"
+  register: ecmwf_data_flavour_mars_before
+  changed_when: false
+  failed_when: false
+
+- name: Require Ubuntu for automatic ECMWF Data Flavour bootstrap
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.distribution == 'Ubuntu'
+    fail_msg: >-
+      Automatic installation of ECMWF Data Flavour {{ ecmwf_data_flavour_version }}
+      is supported by this blueprint on Ubuntu, matching the upstream Community
+      Hub item. On another distribution, install/provide the native MARS client
+      first or deploy the blueprint on Ubuntu 24.04.
+  when: ecmwf_data_flavour_mars_before.rc != 0
+
+- name: Create ECMWF Data Flavour bootstrap directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ flexpart_operator_user }}"
+    group: "{{ flexpart_service_group }}"
+    mode: "0755"
+  loop:
+    - "{{ ecmwf_data_flavour_root }}"
+    - "{{ ecmwf_data_flavour_roles_dir }}"
+  when: ecmwf_data_flavour_mars_before.rc != 0
+
+- name: Checkout pinned official ECMWF Data Flavour source
+  ansible.builtin.git:
+    repo: "{{ ecmwf_data_flavour_repository }}"
+    dest: "{{ ecmwf_data_flavour_source_dir }}"
+    version: "{{ ecmwf_data_flavour_version }}"
+    force: false
+  become: true
+  become_user: "{{ flexpart_operator_user }}"
+  when: ecmwf_data_flavour_mars_before.rc != 0
+
+- name: Check pinned ECMWF Data Flavour files
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop:
+    - "{{ ecmwf_data_flavour_requirements_file }}"
+    - "{{ ecmwf_data_flavour_playbook }}"
+  register: ecmwf_data_flavour_files
+  when: ecmwf_data_flavour_mars_before.rc != 0
+
+- name: Require expected ECMWF Data Flavour structure
+  ansible.builtin.assert:
+    that:
+      - ecmwf_data_flavour_files.results | length == 2
+      - ecmwf_data_flavour_files.results[0].stat.exists
+      - ecmwf_data_flavour_files.results[1].stat.exists
+    fail_msg: >-
+      ECMWF Data Flavour {{ ecmwf_data_flavour_version }} does not contain the
+      expected repository-root requirements.yml and ECMWF Data Flavour playbook.
+      Inspect {{ ecmwf_data_flavour_source_dir }} and update the pinned integration
+      before deploying a different upstream layout.
+  when: ecmwf_data_flavour_mars_before.rc != 0
+
+- name: Create isolated Ansible environment for ECMWF Data Flavour
+  ansible.builtin.command:
+    cmd: "python3 -m venv {{ ecmwf_data_flavour_ansible_venv }}"
+    creates: "{{ ecmwf_data_flavour_ansible_venv }}/bin/python"
+  become: true
+  become_user: "{{ flexpart_operator_user }}"
+  when: ecmwf_data_flavour_mars_before.rc != 0
+
+- name: Install Ansible for ECMWF Data Flavour bootstrap
+  ansible.builtin.pip:
+    name: "{{ ecmwf_data_flavour_ansible_spec }}"
+    state: present
+    virtualenv: "{{ ecmwf_data_flavour_ansible_venv }}"
+  become: true
+  become_user: "{{ flexpart_operator_user }}"
+  when: ecmwf_data_flavour_mars_before.rc != 0
+
+- name: Install official ECMWF Data Flavour role requirements
+  ansible.builtin.command:
+    argv:
+      - "{{ ecmwf_data_flavour_ansible_venv }}/bin/ansible-galaxy"
+      - role
+      - install
+      - -r
+      - "{{ ecmwf_data_flavour_requirements_file }}"
+      - --roles-path
+      - "{{ ecmwf_data_flavour_roles_dir }}"
+      - --force
+  become: true
+  become_user: "{{ flexpart_operator_user }}"
+  environment:
+    ANSIBLE_ROLES_PATH: "{{ ecmwf_data_flavour_roles_dir }}"
+  changed_when: true
+  when: ecmwf_data_flavour_mars_before.rc != 0
+
+- name: Install local inventory for ECMWF Data Flavour
+  ansible.builtin.template:
+    src: inventory.yml.j2
+    dest: "{{ ecmwf_data_flavour_inventory }}"
+    owner: "{{ flexpart_operator_user }}"
+    group: "{{ flexpart_service_group }}"
+    mode: "0600"
+  when: ecmwf_data_flavour_mars_before.rc != 0
+
+- name: Apply official ECMWF Data Flavour without updating the VM
+  ansible.builtin.command:
+    argv:
+      - "{{ ecmwf_data_flavour_ansible_venv }}/bin/ansible-playbook"
+      - -i
+      - "{{ ecmwf_data_flavour_inventory }}"
+      # The outer blueprint already prepares the operating system. The
+      # upstream Data Flavour playbook defaults update_vm=true, which can
+      # trigger a reboot. Because this nested play runs with a local
+      # connection, Ansible intentionally refuses to reboot its controller.
+      # Disable only that optional update role; MARS and ECMWF Toolbox still
+      # run normally.
+      - --extra-vars
+      - '{"update_vm": false}'
+      - "{{ ecmwf_data_flavour_playbook }}"
+    chdir: "{{ ecmwf_data_flavour_item_dir }}"
+  become: true
+  become_user: "{{ flexpart_operator_user }}"
+  environment:
+    ANSIBLE_ROLES_PATH: "{{ ecmwf_data_flavour_roles_dir }}"
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+  changed_when: true
+  when: ecmwf_data_flavour_mars_before.rc != 0
+
+- name: Verify native MARS client after ECMWF Data Flavour setup
+  ansible.builtin.shell:
+    cmd: /bin/bash -lc 'command -v mars'
+  become: true
+  become_user: "{{ flexpart_operator_user }}"
+  register: ecmwf_data_flavour_mars_after
+  changed_when: false
+  failed_when: false
+
+- name: Require native MARS client
+  ansible.builtin.assert:
+    that:
+      - ecmwf_data_flavour_mars_after.rc == 0
+    fail_msg: >-
+      The native MARS client is still unavailable after applying ECMWF Data
+      Flavour {{ ecmwf_data_flavour_version }}. Deploy on the ECMWF side of EWC
+      with external connectivity and inspect the Data Flavour task output.

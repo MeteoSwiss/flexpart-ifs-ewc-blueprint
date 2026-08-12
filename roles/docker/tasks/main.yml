@@ -1,0 +1,94 @@
+---
+- name: Require a supported Linux package family for Docker
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.distribution == 'Ubuntu' or ansible_os_family == 'RedHat'
+    fail_msg: >-
+      Unsupported operating system {{ ansible_facts.distribution }}. Docker
+      installation currently supports Ubuntu and Rocky/RHEL-family hosts.
+
+# Ubuntu installation
+- name: Determine Docker apt architecture
+  ansible.builtin.set_fact:
+    docker_apt_architecture: >-
+      {{ docker_apt_architecture_map.get(ansible_facts.architecture, ansible_facts.architecture) }}
+  when: ansible_facts.distribution == 'Ubuntu'
+
+- name: Create apt keyring directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: "0755"
+  when: ansible_facts.distribution == 'Ubuntu'
+
+- name: Download Docker repository signing key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: "0644"
+  when: ansible_facts.distribution == 'Ubuntu'
+
+- name: Configure Docker apt repository
+  ansible.builtin.apt_repository:
+    repo: >-
+      deb [arch={{ docker_apt_architecture }} signed-by=/etc/apt/keyrings/docker.asc]
+      https://download.docker.com/linux/ubuntu
+      {{ ansible_facts.distribution_release }} stable
+    filename: docker
+    state: present
+    update_cache: true
+  when: ansible_facts.distribution == 'Ubuntu'
+
+- name: Install Docker Engine and Compose plugin on Ubuntu hosts
+  ansible.builtin.apt:
+    name: "{{ docker_packages }}"
+    state: present
+  when: ansible_facts.distribution == 'Ubuntu'
+
+# Rocky / RHEL-family installation
+- name: Remove Docker-conflicting packages on RedHat-family hosts
+  ansible.builtin.dnf:
+    name: "{{ docker_redhat_conflicting_packages }}"
+    state: absent
+  when: ansible_os_family == 'RedHat'
+
+- name: Install Docker repository tooling on RedHat-family hosts
+  ansible.builtin.dnf:
+    name: dnf-plugins-core
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: Configure Docker RPM repository on RedHat-family hosts
+  ansible.builtin.command:
+    argv:
+      - dnf
+      - config-manager
+      - --add-repo
+      - "{{ docker_redhat_repository_url }}"
+    creates: /etc/yum.repos.d/docker-ce.repo
+  when: ansible_os_family == 'RedHat'
+
+- name: Install Docker Engine and Compose plugin on RedHat-family hosts
+  ansible.builtin.dnf:
+    name: "{{ docker_packages }}"
+    state: present
+    update_cache: true
+  when: ansible_os_family == 'RedHat'
+
+- name: Enable and start Docker
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Add workflow user to Docker group
+  ansible.builtin.user:
+    name: "{{ flexpart_service_user }}"
+    groups: docker
+    append: true
+
+- name: Add workflow operator to Docker group
+  ansible.builtin.user:
+    name: "{{ flexpart_operator_user }}"
+    groups: docker
+    append: true

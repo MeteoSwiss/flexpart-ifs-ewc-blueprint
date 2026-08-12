@@ -1,0 +1,70 @@
+---
+- name: Require a supported Linux package family
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family in ['Debian', 'RedHat']
+    fail_msg: >-
+      Unsupported operating-system family {{ ansible_os_family }}. This
+      blueprint currently supports Ubuntu/Debian-family and Rocky/RHEL-family
+      hosts.
+
+- name: Install base packages on Debian-family hosts
+  ansible.builtin.apt:
+    name: "{{ flexpart_system_packages }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  when: ansible_os_family == 'Debian'
+
+- name: Install base packages on RedHat-family hosts
+  ansible.builtin.dnf:
+    name: "{{ flexpart_system_packages }}"
+    state: present
+    update_cache: true
+  when: ansible_os_family == 'RedHat'
+
+- name: Create workflow service group
+  ansible.builtin.group:
+    name: "{{ flexpart_service_group }}"
+    system: true
+    state: present
+
+- name: Create workflow service user
+  ansible.builtin.user:
+    name: "{{ flexpart_service_user }}"
+    group: "{{ flexpart_service_group }}"
+    system: true
+    create_home: true
+    home: "/home/{{ flexpart_service_user }}"
+    shell: /bin/bash
+    state: present
+
+- name: Add workflow operator to FLEXPART service group
+  ansible.builtin.user:
+    name: "{{ flexpart_operator_user }}"
+    groups: "{{ flexpart_service_group }}"
+    append: true
+
+- name: Install orchestrator dependencies on Debian-family hosts
+  ansible.builtin.apt:
+    name:
+      - acl
+      - git
+      - python3
+      - python3-pip
+      - python3-venv
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  when: ansible_os_family == 'Debian'
+
+- name: Install orchestrator dependencies on RedHat-family hosts
+  ansible.builtin.dnf:
+    name:
+      - acl
+      - git
+      - python3
+      - python3-pip
+    state: present
+    update_cache: true
+  when: ansible_os_family == 'RedHat'

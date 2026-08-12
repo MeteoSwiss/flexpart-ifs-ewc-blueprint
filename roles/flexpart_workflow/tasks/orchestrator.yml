@@ -1,0 +1,73 @@
+---
+- name: Ensure orchestrator version has been configured
+  ansible.builtin.assert:
+    that:
+      - flexpart_orchestrator_version | length > 0
+      - "'REPLACE_' not in flexpart_orchestrator_version"
+    fail_msg: >-
+      Set flexpart_orchestrator_version to a release tag or commit before
+      deploying the workflow.
+
+- name: Clone the pinned orchestrator source
+  ansible.builtin.git:
+    repo: "{{ flexpart_orchestrator_repository }}"
+    dest: "{{ flexpart_orchestrator_source_dir }}"
+    version: "{{ flexpart_orchestrator_version }}"
+    force: false
+  become: true
+  become_user: "{{ flexpart_service_user }}"
+  register: flexpart_orchestrator_checkout
+
+- name: Create orchestrator virtual environment
+  ansible.builtin.command:
+    cmd: "python3 -m venv {{ flexpart_orchestrator_venv }}"
+    creates: "{{ flexpart_orchestrator_venv }}/bin/python"
+  become: true
+  become_user: "{{ flexpart_service_user }}"
+
+- name: Upgrade pip in orchestrator virtual environment
+  ansible.builtin.pip:
+    name:
+      - pip
+      - setuptools
+      - wheel
+    state: latest
+    virtualenv: "{{ flexpart_orchestrator_venv }}"
+  become: true
+  become_user: "{{ flexpart_service_user }}"
+
+- name: Install the orchestrator package
+  ansible.builtin.pip:
+    name: "{{ flexpart_orchestrator_source_dir }}"
+    state: present
+    virtualenv: "{{ flexpart_orchestrator_venv }}"
+  become: true
+  become_user: "{{ flexpart_service_user }}"
+
+- name: Check that the orchestrator executable was installed
+  ansible.builtin.stat:
+    path: "{{ flexpart_orchestrator_executable }}"
+  register: flexpart_orchestrator_cli
+
+- name: Fail when the orchestrator CLI is missing
+  ansible.builtin.assert:
+    that:
+      - flexpart_orchestrator_cli.stat.exists
+      - flexpart_orchestrator_cli.stat.executable
+    fail_msg: >-
+      The flexpart-workflow executable was not installed. Confirm that
+      pyproject.toml contains the tool.poetry.scripts entry.
+
+- name: Create system-wide orchestrator command
+  ansible.builtin.file:
+    src: "{{ flexpart_orchestrator_executable }}"
+    dest: /usr/local/bin/flexpart-workflow
+    state: link
+    owner: root
+    group: root
+    force: true
+
+- name: Check orchestrator command
+  ansible.builtin.command:
+    cmd: /usr/local/bin/flexpart-workflow --help
+  changed_when: false

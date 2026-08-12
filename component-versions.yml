@@ -1,0 +1,25 @@
+---
+blueprint_version: 0.1.0
+
+components:
+  ecmwf_data_flavour:
+    repository: https://github.com/ewcloud/ewc-flavours.git
+    version: 2.0.2
+
+  orchestrator:
+    repository: https://github.com/MeteoSwiss/flex-container-orchestrator.git
+    version: 0.1.1
+
+  flexprep:
+    repository: https://gitlab.phaidra.org/flexpart/flexprep
+    version: v0.2.2
+
+  flexpart:
+    repository: https://github.com/MeteoSwiss/flexpart.git
+    version: 10.5.0
+    image: docker.io/ninaburg/flexpart-ifs:10.5.0
+
+  pyflexplot:
+    repository: https://github.com/MeteoSwiss-APN/pyflexplot.git
+    version: 2.7.1
+    image: docker.io/ninaburg/pyflexplot:2.7.1

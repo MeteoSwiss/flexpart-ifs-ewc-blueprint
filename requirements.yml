@@ -1,0 +1,5 @@
+---
+# EWCCLI reads this file before running deploy.yml. The pinned ECMWF Data
+# Flavour installs its own role requirements on the target VM when needed.
+roles: []
+collections: []

@@ -1,0 +1,17 @@
+---
+- name: Create FLEXPART installation directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ flexpart_service_user }}"
+    group: "{{ flexpart_service_group }}"
+    mode: "{{ item.mode }}"
+  loop: "{{ flexpart_directory_definitions }}"
+
+- name: Keep FLEXPART configuration owned by root
+  ansible.builtin.file:
+    path: "{{ flexpart_config_dir }}"
+    state: directory
+    owner: root
+    group: "{{ flexpart_service_group }}"
+    mode: "0750"

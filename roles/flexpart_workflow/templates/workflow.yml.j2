@@ -1,0 +1,24 @@
+---
+main:
+  runtime:
+    compose_file: "{{ flexpart_compose_file }}"
+    run_dir: "{{ flexpart_run_dir }}"
+    plot_dir: "{{ flexpart_plot_dir }}"
+
+  flexprep:
+    output_dir: "{{ flexpart_meteorology_dir }}"
+    area:
+      - {{ flexpart_area[0] }}
+      - {{ flexpart_area[1] }}
+      - {{ flexpart_area[2] }}
+      - {{ flexpart_area[3] }}
+    grid:
+      - {{ flexpart_grid[0] }}
+      - {{ flexpart_grid[1] }}
+    max_level: {{ flexpart_max_level }}
+    mars_class: "{{ flexpart_mars_class }}"
+    expver: "{{ flexpart_mars_expver }}"
+
+  workflow:
+    plotting_preset: "{{ flexpart_plotting_preset }}"
+    emission_duration_hours: {{ flexpart_emission_duration_hours }}
