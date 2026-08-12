@@ -77,19 +77,6 @@ PDF plots are written to:
 /var/lib/flexpart-ifs/plots
 ```
 
-## Alternative: Ansible
-
-The same playbook can configure an existing VM:
-
-```bash
-cp inventory.example.yml inventory.yml
-ansible-galaxy install -r requirements.yml
-ansible-playbook -i inventory.yml deploy.yml
-```
-
-Ubuntu 24.04 is recommended. On a non-Ubuntu VM, provide the native MARS client
-before running the playbook if the upstream ECMWF Data Flavour cannot be used.
-
 ## License
 
 The deployment code and documentation are licensed under the Apache License

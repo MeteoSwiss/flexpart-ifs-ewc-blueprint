@@ -19,9 +19,7 @@ flexpart_meteorology_dir: "{{ flexpart_data_dir }}/meteorology"
 flexpart_run_dir: "{{ flexpart_data_dir }}/runs"
 flexpart_plot_dir: "{{ flexpart_data_dir }}/plots"
 
-# Host-installed orchestrator. Pin this to a release tag or commit before the
-# final Community Hub publication. The feature branch is used for the current
-# prototype because it contains the EWC MARS -> flexprep -> FLEXPART workflow.
+# Host-installed orchestrator
 flexpart_orchestrator_repository: >-
   https://github.com/MeteoSwiss/flex-container-orchestrator.git
 flexpart_orchestrator_version: v0.1.0

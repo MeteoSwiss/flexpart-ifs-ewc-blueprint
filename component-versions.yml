@@ -1,5 +1,5 @@
 ---
-blueprint_version: 0.1.0-dev
+blueprint_version: 0.1.0
 
 components:
   ecmwf_data_flavour:
