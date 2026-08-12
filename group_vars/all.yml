@@ -22,7 +22,7 @@ flexpart_plot_dir: "{{ flexpart_data_dir }}/plots"
 # Host-installed orchestrator
 flexpart_orchestrator_repository: >-
   https://github.com/MeteoSwiss/flex-container-orchestrator.git
-flexpart_orchestrator_version: v0.1.0
+flexpart_orchestrator_version: 0.1.1
 flexpart_orchestrator_source_dir: >-
   {{ flexpart_install_dir }}/src/flex-container-orchestrator
 flexpart_orchestrator_venv: "{{ flexpart_install_dir }}/venv"

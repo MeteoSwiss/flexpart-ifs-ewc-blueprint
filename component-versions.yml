@@ -8,7 +8,7 @@ components:
 
   orchestrator:
     repository: https://github.com/MeteoSwiss/flex-container-orchestrator.git
-    version: v0.1.0
+    version: 0.1.1
 
   flexprep:
     repository: https://gitlab.phaidra.org/flexpart/flexprep
