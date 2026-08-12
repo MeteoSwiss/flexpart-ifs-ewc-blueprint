@@ -2,7 +2,7 @@
 
 ## Deployment boundary
 
-The EWC CLI or an operator creates/selects the target Ubuntu VM. `deploy.yml` configures that VM. The scientific components remain independently versioned container images.
+The EWC CLI or an operator creates/selects the target Ubuntu or Rocky Linux VM. `deploy.yml` configures that VM. Package-management and Docker-repository tasks select the appropriate Debian- or RedHat-family path. The scientific components remain independently versioned container images.
 
 ## Runtime components
 

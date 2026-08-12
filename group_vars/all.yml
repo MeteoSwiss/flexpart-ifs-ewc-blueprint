@@ -2,10 +2,12 @@
 flexpart_service_user: flexpart
 flexpart_service_group: flexpart
 
-# The user who invokes flexpart-workflow on the EWC VM. The inventory already
-# defines ansible_user, so use the same account by default. This user owns the
-# MARS client configuration/credentials used by the host-side orchestrator.
-flexpart_operator_user: "{{ ansible_user }}"
+# The user who invokes flexpart-workflow on the EWC VM. Direct Ansible
+# inventories can define ansible_user explicitly. EWCCLI passes its SSH user
+# with -u, which does not necessarily define the ansible_user variable, so use
+# the ECMWF-side default account as a fallback. This user owns the MARS client
+# configuration/credentials used by the host-side orchestrator.
+flexpart_operator_user: "{{ ansible_user | default('cloud-user') }}"
 
 flexpart_install_dir: /opt/flexpart-ifs
 flexpart_config_dir: /etc/flexpart-ifs

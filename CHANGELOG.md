@@ -9,7 +9,7 @@ The format is based on Keep a Changelog, and the project intends to use Semantic
 ### Added
 
 - Initial repository scaffold.
-- Ansible deployment roles for Ubuntu, Docker and workflow configuration.
+- Ansible deployment roles for Ubuntu/Rocky Linux, Docker and workflow configuration.
 - Docker Compose and configuration templates.
 - Draft EWC Community Hub custom catalog entry.
 - Documentation and reference-case skeleton.

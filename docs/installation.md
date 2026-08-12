@@ -3,7 +3,7 @@
 ## Existing-VM installation
 
 1. Create a supported EWC VM.
-2. Ensure SSH access works.
+2. Ensure SSH access works. Typical cloud users are `ubuntu` on Ubuntu and `cloud-user` on Rocky Linux.
 3. Copy `inventory.example.yml` to `inventory.yml` and edit it.
 4. Replace image and storage placeholders in `group_vars/all.yml`.
 5. Install Ansible requirements:

@@ -59,7 +59,7 @@ PDF plots are written to:
 
 ## Alternative: Ansible
 
-The same playbook can configure an existing ECMWF-side Ubuntu VM:
+The same playbook can configure an existing ECMWF-side Ubuntu or Rocky Linux VM:
 
 ```bash
 cp inventory.example.yml inventory.yml

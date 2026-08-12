@@ -5,5 +5,5 @@ all:
       hosts:
         flexpart-ewc-vm:
           ansible_host: REPLACE_WITH_VM_IP_OR_DNS
-          ansible_user: ubuntu
+          ansible_user: REPLACE_WITH_SSH_USER
           ansible_ssh_private_key_file: ~/.ssh/REPLACE_WITH_PRIVATE_KEY

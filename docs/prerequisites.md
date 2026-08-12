@@ -10,7 +10,7 @@
 
 ## Initial VM target
 
-- Ubuntu 22.04.
+- Ubuntu 22.04 or Rocky Linux 9 (the EWCCLI default tested here).
 - 8 vCPU.
 - 16 GiB memory.
 - At least 30 GiB storage.
