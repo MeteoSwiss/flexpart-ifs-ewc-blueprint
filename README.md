@@ -22,28 +22,6 @@ ewc hub \
 The workflow has been tested with 8 vCPU, 16 GiB RAM and 80 GB storage.
 Smaller flavours may not provide enough resources for FLEXPART-IFS runs.
 
-The blueprint metadata defaults to **Ubuntu 24.04** and requests an external IP.
-EWCCLI resolves the current matching image for the selected EWC region, uses the
-appropriate Ubuntu SSH account, and passes the external IP to Ansible.
-
-If the native `mars` client is missing, the blueprint applies the official
-**ECMWF Data Flavour 2.0.2** before installing FLEXPART-IFS. The automatic Data
-Flavour bootstrap is intentionally Ubuntu-based, matching the upstream item.
-The local system and Docker roles remain usable on Rocky/RHEL-family hosts when
-a native MARS client is already available.
-
-Organisation-specific SSH routing is deliberately not part of the blueprint. If
-your environment requires a SOCKS proxy, VPN or bastion, configure it locally in
-SSH/Ansible.
-
-To recreate an existing test VM using the catalogue defaults:
-
-```bash
-ewc hub \
-  --path-to-catalog ./catalog/custom_catalog.yml \
-  deploy flexpart-ifs \
-  --force
-```
 
 ## Configure MARS
 

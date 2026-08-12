@@ -24,9 +24,9 @@ services:
       - SIMULATION_END_DD=${SIMULATION_END_DD}
       - SIMULATION_END_ZZ=${SIMULATION_END_ZZ}
 
-    # The image's default entrypoint uploads FLEXPART output to S3. The EWC
-    # workflow keeps the complete run local and therefore runs only generation
-    # plus FLEXPART itself.
+    # Override the image entrypoint so the EWC workflow keeps FLEXPART output
+    # on the VM (no S3). Job generation and FLEXPART execution are orchestrated here;
+    # output publication is handled separately by the workflow.
     entrypoint: ["/bin/bash", "-lc"]
     command:
       - |
