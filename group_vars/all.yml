@@ -24,7 +24,7 @@ flexpart_plot_dir: "{{ flexpart_data_dir }}/plots"
 # prototype because it contains the EWC MARS -> flexprep -> FLEXPART workflow.
 flexpart_orchestrator_repository: >-
   https://github.com/MeteoSwiss/flex-container-orchestrator.git
-flexpart_orchestrator_version: feat/ewc-blueprint-runtime
+flexpart_orchestrator_version: v0.1.0
 flexpart_orchestrator_source_dir: >-
   {{ flexpart_install_dir }}/src/flex-container-orchestrator
 flexpart_orchestrator_venv: "{{ flexpart_install_dir }}/venv"

@@ -7,33 +7,19 @@ components:
     version: 2.0.2
 
   orchestrator:
-    repository: REPLACE_BEFORE_RELEASE
-    version: REPLACE_BEFORE_RELEASE
-    commit: REPLACE_BEFORE_RELEASE
-    image: REPLACE_BEFORE_RELEASE
-    image_digest: REPLACE_BEFORE_RELEASE
+    repository: https://github.com/MeteoSwiss/flex-container-orchestrator.git
+    version: v0.1.0
 
   flexprep:
-    repository: REPLACE_BEFORE_RELEASE
-    version: REPLACE_BEFORE_RELEASE
-    commit: REPLACE_BEFORE_RELEASE
-    image: REPLACE_BEFORE_RELEASE
-    image_digest: REPLACE_BEFORE_RELEASE
-
-  preflexpart:
-    repository: https://gitlab.phaidra.org/flexpart/preflexpart
-    version: REPLACE_BEFORE_RELEASE
+    repository: https://gitlab.phaidra.org/flexpart/flexprep
+    version: v0.2.2
 
   flexpart:
     repository: https://github.com/MeteoSwiss/flexpart.git
     version: 10.5.0
-    commit: REPLACE_BEFORE_RELEASE
     image: docker.io/ninaburg/flexpart-ifs:10.5.0
-    image_digest: REPLACE_BEFORE_RELEASE
 
   pyflexplot:
     repository: https://github.com/MeteoSwiss-APN/pyflexplot.git
     version: 2.7.1
-    commit: REPLACE_BEFORE_RELEASE
     image: docker.io/ninaburg/pyflexplot:2.7.1
-    image_digest: REPLACE_BEFORE_RELEASE
