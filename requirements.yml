@@ -1,5 +1,5 @@
 ---
-# This first scaffold uses only ansible.builtin modules.
-# Add and pin external roles or collections here when required.
+# EWCCLI reads this file before running deploy.yml. The pinned ECMWF Data
+# Flavour installs its own role requirements on the target VM when needed.
 roles: []
 collections: []

@@ -15,82 +15,39 @@ spec:
       version: "0.1.0"
       published: false
       summary: >-
-        Deploys a containerized workflow for IFS preparation, FLEXPART-IFS
-        execution and dispersion plotting on the European Weather Cloud.
+        Deploys FLEXPART-IFS on a European Weather Cloud virtual machine using
+        IFS forecast data retrieved from ECMWF MARS.
       description: |
-        Installs Docker and configures the containerized FLEXPART-IFS workflow
-        on an Ubuntu virtual machine in an EWC project.
+        This Ansible Playbook configures a virtual machine in the European
+        Weather Cloud to run FLEXPART-IFS. It can be deployed with EWCCLI or
+        applied with Ansible to an existing VM.
 
-        The intended workflow includes Flexprep/Preflexpart, FLEXPART-IFS,
-        Pyflexplot and the Flex Container Orchestrator. Manual execution is the
-        initial supported mode; Aviso-triggered execution is optional and must
-        be configured separately.
+        The workflow retrieves IFS forecast data from ECMWF MARS, preprocesses
+        it with flexprep, runs FLEXPART-IFS, and generates PDF dispersion plots
+        with Pyflexplot.
+
+        After deployment, users run simulations from the command line, for
+        example:
+
+            flexpart-workflow --latest --step 24 --location BEZ
+
+        Users can also select an explicit forecast cycle for reproducible runs.
+
+        EWCCLI deployments use the ECMWF side and request a public IP. If the
+        native MARS client is not already present, this blueprint applies the
+        official ECMWF Data Flavour 2.0.2 before installing FLEXPART-IFS.
+        MARS credentials and data entitlements remain user-specific.
       home: https://github.com/MeteoSwiss/flexpart-ifs-ewc-blueprint
       sources:
         - https://github.com/MeteoSwiss/flexpart-ifs-ewc-blueprint.git
+
+      ewccli:
+        pathToRequirementsFile: requirements.yml
+        pathToMainFile: deploy.yml
+        publicIP: true
+        inputs: []
       license: https://github.com/MeteoSwiss/flexpart-ifs-ewc-blueprint/blob/main/LICENSE
       icon: https://raw.githubusercontent.com/ewcloud/ewc-community-hub/refs/heads/main/logos/EWCLogo.png
       maintainers:
         - name: MeteoSwiss
           url: https://github.com/MeteoSwiss/flexpart-ifs-ewc-blueprint/issues
-
-      # Current catalog metadata schema places deployment values here.
-      values:
-        pathToMainFile: deploy.yml
-        pathToRequirementsFile: requirements.yml
-        osImageName: REPLACE_WITH_CURRENT_EWC_UBUNTU_22_04_IMAGE
-        osFlavorName: REPLACE_WITH_FLAVOR_PROVIDING_8_VCPU_16_GIB
-        ansibleVersion: "10.7.0"
-        inputSpec:
-          - name: flexpart_workflow_mode
-            description: "Execution mode: manual or aviso."
-            type: str
-            default: manual
-          - name: flexpart_pull_images
-            description: "Pull configured workflow container images."
-            type: bool
-            default: false
-          - name: flexpart_start_services
-            description: "Start the orchestrator after installation."
-            type: bool
-            default: false
-          - name: flexpart_s3_endpoint_url
-            description: "S3-compatible endpoint used by the EWC project."
-            type: str
-          - name: flexpart_raw_ifs_bucket
-            description: "Bucket containing raw IFS data."
-            type: str
-            default: flexpart-raw-ifs
-          - name: flexpart_preprocessed_bucket
-            description: "Bucket containing preprocessed FLEXPART inputs."
-            type: str
-            default: flexpart-preprocessed
-          - name: flexpart_output_bucket
-            description: "Bucket containing FLEXPART output."
-            type: str
-            default: flexpart-output
-          - name: flexpart_plots_bucket
-            description: "Bucket containing generated plots."
-            type: str
-            default: flexpart-plots
-
-      # Kept for compatibility testing with EWC CLI releases whose README
-      # documents deployment fields below ewccli. Verify before publication.
-      ewccli:
-        externalIP: true
-        checkDNS: false
-        pathToMainFile: deploy.yml
-        pathToRequirementsFile: requirements.yml
-        inputs:
-          - name: flexpart_workflow_mode
-            description: "Execution mode: manual or aviso."
-            type: str
-            default: manual
-          - name: flexpart_pull_images
-            description: "Pull configured workflow images."
-            type: bool
-            default: false
-          - name: flexpart_start_services
-            description: "Start the orchestrator after installation."
-            type: bool
-            default: false

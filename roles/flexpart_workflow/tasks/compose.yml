@@ -6,3 +6,11 @@
     owner: root
     group: "{{ flexpart_service_group }}"
     mode: "0644"
+
+- name: Pull public workflow container images
+  ansible.builtin.command:
+    cmd: "docker pull {{ item }}"
+  loop:
+    - "{{ flexpart_model_image }}"
+    - "{{ pyflexplot_image }}"
+  changed_when: false

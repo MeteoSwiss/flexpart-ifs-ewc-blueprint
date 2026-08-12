@@ -53,7 +53,7 @@
 
 - name: Check that MARS is available to the workflow operator
   ansible.builtin.shell:
-    cmd: command -v mars
+    cmd: /bin/bash -lc 'command -v mars'
     executable: /bin/bash
   become_user: "{{ flexpart_operator_user }}"
   changed_when: false

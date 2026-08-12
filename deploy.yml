@@ -1,10 +1,11 @@
 ---
 - name: Deploy FLEXPART-IFS workflow
-  hosts: flexpart
+  hosts: all
   become: true
 
   roles:
     - role: system
+    - role: ecmwf_data_flavour
     - role: docker
     - role: flexpart_workflow
     - role: validation

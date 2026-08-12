@@ -2,6 +2,10 @@
 blueprint_version: 0.1.0-dev
 
 components:
+  ecmwf_data_flavour:
+    repository: https://github.com/ewcloud/ewc-flavours.git
+    version: 2.0.2
+
   orchestrator:
     repository: REPLACE_BEFORE_RELEASE
     version: REPLACE_BEFORE_RELEASE
