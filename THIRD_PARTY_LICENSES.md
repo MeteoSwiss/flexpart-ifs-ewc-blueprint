@@ -1,16 +1,23 @@
 # Third-party software
 
-The Apache License 2.0 applying to this repository does not replace the licences of software deployed by the blueprint.
+The Apache License 2.0 applying to this repository covers the deployment
+code and documentation contained in this repository. Software installed
+or executed by the blueprint remains subject to its respective licence.
 
-| Component | Licence | Source | Status |
-|---|---|---|---|
-| FLEXPART | GPL-3.0 | MeteoSwiss FLEXPART repository | Confirm exact repository and release |
-| Pyflexplot | MIT | MeteoSwiss-APN Pyflexplot repository | Confirm exact repository and release |
-| Preflexpart | To be verified | https://gitlab.phaidra.org/flexpart/preflexpart | Required before release |
-| Flexprep | To be verified | MeteoSwiss repository | Required before release |
-| Flex Container Orchestrator | To be verified | MeteoSwiss repository | Required before release |
-| Docker Engine | Apache-2.0 | https://github.com/moby/moby | Runtime dependency |
-| Ansible | GPL-3.0-or-later | https://github.com/ansible/ansible | Deployment dependency |
-| ECMWF Data Flavour | Apache-2.0 | https://github.com/ewcloud/ewc-flavours | Deployment dependency (pinned to 2.0.2) |
+| Component | Version | Licence | Source |
+| --- | --- | --- | --- |
+| FLEXPART | 10.5.0 | GPL-3.0-or-later | https://github.com/MeteoSwiss/flexpart |
+| flexprep | v0.2.2 | BSD-3-Clause | https://gitlab.phaidra.org/flexpart/flexprep |
+| Pyflexplot | 2.7.1 | MIT | https://github.com/MeteoSwiss-APN/pyflexplot |
+| Flex Container Orchestrator | 0.1.1 | BSD-3-Clause | https://github.com/MeteoSwiss/flex-container-orchestrator |
+| ECMWF Data Flavour | 2.0.2 | Apache-2.0 | https://github.com/ewcloud/ewc-flavours |
 
-Users and redistributors are responsible for complying with each component's licence.
+## Deployment/runtime dependencies
+
+| Component | Licence | Purpose |
+| --- | --- | --- |
+| Ansible | GPL-3.0-or-later | Deployment dependency |
+| Docker/Moby | Apache-2.0 | Container runtime dependency |
+
+Users and redistributors are responsible for complying with the licence
+terms of each third-party component.
