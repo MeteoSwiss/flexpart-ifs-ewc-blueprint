@@ -2,6 +2,9 @@
 
 Deploy FLEXPART-IFS on the European Weather Cloud (EWC).
 
+> **Note:** This blueprint is supported and tested only on the ECMWF side of
+> the European Weather Cloud.
+
 ```text
 ECMWF MARS → flexprep → FLEXPART-IFS → Pyflexplot → PDF plots
 ```
